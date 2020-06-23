@@ -4432,7 +4432,7 @@ func (c *EC2) CreateInstanceExportTaskRequest(input *CreateInstanceExportTaskInp
 
 // CreateInstanceExportTask API operation for Amazon Elastic Compute Cloud.
 //
-// Exports a running or stopped instance to an S3 bucket.
+// Exports a running or stopped instance to an Amazon S3 bucket.
 //
 // For information about the supported operating systems, image formats, and
 // known limitations for the types of instances you can export, see Exporting
@@ -13984,7 +13984,7 @@ func (c *EC2) DescribeExportImageTasksRequest(input *DescribeExportImageTasksInp
 
 // DescribeExportImageTasks API operation for Amazon Elastic Compute Cloud.
 //
-// Describes the specified export image tasks or all your export image tasks.
+// Describes the specified export image tasks or all of your export image tasks.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -14110,7 +14110,7 @@ func (c *EC2) DescribeExportTasksRequest(input *DescribeExportTasksInput) (req *
 
 // DescribeExportTasks API operation for Amazon Elastic Compute Cloud.
 //
-// Describes the specified export instance tasks or all your export instance
+// Describes the specified export instance tasks or all of your export instance
 // tasks.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -20884,12 +20884,12 @@ func (c *EC2) DescribeSnapshotsRequest(input *DescribeSnapshotsInput) (req *requ
 // (if you own the snapshots), self for snapshots for which you own or have
 // explicit permissions, or all for public snapshots.
 //
-// If you are describing a long list of snapshots, you can paginate the output
-// to make the list more manageable. The MaxResults parameter sets the maximum
-// number of results returned in a single page. If the list of results exceeds
-// your MaxResults value, then that number of results is returned along with
-// a NextToken value that can be passed to a subsequent DescribeSnapshots request
-// to retrieve the remaining results.
+// If you are describing a long list of snapshots, we recommend that you paginate
+// the output to make the list more manageable. The MaxResults parameter sets
+// the maximum number of results returned in a single page. If the list of results
+// exceeds your MaxResults value, then that number of results is returned along
+// with a NextToken value that can be passed to a subsequent DescribeSnapshots
+// request to retrieve the remaining results.
 //
 // To get the state of fast snapshot restores for a snapshot, use DescribeFastSnapshotRestores.
 //
@@ -23524,12 +23524,12 @@ func (c *EC2) DescribeVolumesRequest(input *DescribeVolumesInput) (req *request.
 //
 // Describes the specified EBS volumes or all of your EBS volumes.
 //
-// If you are describing a long list of volumes, you can paginate the output
-// to make the list more manageable. The MaxResults parameter sets the maximum
-// number of results returned in a single page. If the list of results exceeds
-// your MaxResults value, then that number of results is returned along with
-// a NextToken value that can be passed to a subsequent DescribeVolumes request
-// to retrieve the remaining results.
+// If you are describing a long list of volumes, we recommend that you paginate
+// the output to make the list more manageable. The MaxResults parameter sets
+// the maximum number of results returned in a single page. If the list of results
+// exceeds your MaxResults value, then that number of results is returned along
+// with a NextToken value that can be passed to a subsequent DescribeVolumes
+// request to retrieve the remaining results.
 //
 // For more information about EBS volumes, see Amazon EBS Volumes (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumes.html)
 // in the Amazon Elastic Compute Cloud User Guide.
@@ -23664,19 +23664,17 @@ func (c *EC2) DescribeVolumesModificationsRequest(input *DescribeVolumesModifica
 
 // DescribeVolumesModifications API operation for Amazon Elastic Compute Cloud.
 //
-// Reports the current modification status of EBS volumes.
+// Describes the most recent volume modification request for the specified EBS
+// volumes.
 //
-// Current-generation EBS volumes support modification of attributes including
-// type, size, and (for io1 volumes) IOPS provisioning while either attached
-// to or detached from an instance. Following an action from the API or the
-// console to modify a volume, the status of the modification may be modifying,
-// optimizing, completed, or failed. If a volume has never been modified, then
-// certain elements of the returned VolumeModification objects are null.
+// If a volume has never been modified, some information in the output will
+// be null. If a volume has been modified more than once, the output includes
+// only the most recent modification request.
 //
 // You can also use CloudWatch Events to check the status of a modification
 // to an EBS volume. For information about CloudWatch Events, see the Amazon
 // CloudWatch Events User Guide (https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/).
-// For more information, see Monitoring Volume Modifications" (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-expand-volume.html#monitoring_mods)
+// For more information, see Monitoring Volume Modifications (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-expand-volume.html#monitoring_mods)
 // in the Amazon Elastic Compute Cloud User Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -46261,7 +46259,7 @@ type CreateInstanceExportTaskInput struct {
 	_ struct{} `type:"structure"`
 
 	// A description for the conversion task or the resource being exported. The
-	// maximum length is 255 bytes.
+	// maximum length is 255 characters.
 	Description *string `locationName:"description" type:"string"`
 
 	// The format and location for an instance export task.
@@ -46271,6 +46269,9 @@ type CreateInstanceExportTaskInput struct {
 	//
 	// InstanceId is a required field
 	InstanceId *string `locationName:"instanceId" type:"string" required:"true"`
+
+	// The tags to apply to the instance export task during creation.
+	TagSpecifications []*TagSpecification `locationName:"TagSpecification" locationNameList:"item" type:"list"`
 
 	// The target virtualization environment.
 	TargetEnvironment *string `locationName:"targetEnvironment" type:"string" enum:"ExportEnvironment"`
@@ -46314,6 +46315,12 @@ func (s *CreateInstanceExportTaskInput) SetExportToS3Task(v *ExportToS3TaskSpeci
 // SetInstanceId sets the InstanceId field's value.
 func (s *CreateInstanceExportTaskInput) SetInstanceId(v string) *CreateInstanceExportTaskInput {
 	s.InstanceId = &v
+	return s
+}
+
+// SetTagSpecifications sets the TagSpecifications field's value.
+func (s *CreateInstanceExportTaskInput) SetTagSpecifications(v []*TagSpecification) *CreateInstanceExportTaskInput {
+	s.TagSpecifications = v
 	return s
 }
 
@@ -57518,10 +57525,11 @@ type DescribeFastSnapshotRestoreSuccessItem struct {
 	// The time at which fast snapshot restores entered the optimizing state.
 	OptimizingTime *time.Time `locationName:"optimizingTime" type:"timestamp"`
 
-	// The alias of the snapshot owner.
+	// The AWS owner alias that enabled fast snapshot restores on the snapshot.
+	// This is intended for future use.
 	OwnerAlias *string `locationName:"ownerAlias" type:"string"`
 
-	// The ID of the AWS account that owns the snapshot.
+	// The ID of the AWS account that enabled fast snapshot restores on the snapshot.
 	OwnerId *string `locationName:"ownerId" type:"string"`
 
 	// The ID of the snapshot.
@@ -57629,7 +57637,8 @@ type DescribeFastSnapshotRestoresInput struct {
 	//
 	//    * availability-zone: The Availability Zone of the snapshot.
 	//
-	//    * owner-id: The ID of the AWS account that owns the snapshot.
+	//    * owner-id: The ID of the AWS account that enabled fast snapshot restore
+	//    on the snapshot.
 	//
 	//    * snapshot-id: The ID of the snapshot.
 	//
@@ -60372,6 +60381,9 @@ type DescribeInstanceTypesInput struct {
 	//
 	//    * ebs-info.encryption-support - Indicates whether EBS encryption is supported.
 	//    (supported | unsupported)
+	//
+	//    * ebs-info.nvme-support - Indicates whether non-volatile memory express
+	//    (NVMe) is supported or required. (required | supported | unsupported)
 	//
 	//    * free-tier-eligible - Indicates whether the instance type is eligible
 	//    to use in the free tier. (true | false)
@@ -64990,12 +65002,12 @@ type DescribeSnapshotsInput struct {
 	//
 	//    * encrypted - Indicates whether the snapshot is encrypted (true | false)
 	//
-	//    * owner-alias - Value from an Amazon-maintained list (amazon | self |
-	//    all | aws-marketplace | microsoft) of snapshot owners. Not to be confused
-	//    with the user-configured AWS account alias, which is set from the IAM
-	//    console.
+	//    * owner-alias - The owner alias, from an Amazon-maintained list (amazon).
+	//    This is not the user-configured AWS account alias set using the IAM console.
+	//    We recommend that you use the related parameter instead of this filter.
 	//
-	//    * owner-id - The ID of the AWS account that owns the snapshot.
+	//    * owner-id - The AWS account ID of the owner. We recommend that you use
+	//    the related parameter instead of this filter.
 	//
 	//    * progress - The progress of the snapshot, as a percentage (for example,
 	//    80%).
@@ -65039,7 +65051,8 @@ type DescribeSnapshotsInput struct {
 	// to return.
 	NextToken *string `type:"string"`
 
-	// Describes the snapshots owned by these owners.
+	// Scopes the results to snapshots with the specified owners. You can specify
+	// a combination of AWS account IDs, self, and amazon.
 	OwnerIds []*string `locationName:"Owner" locationNameList:"Owner" type:"list"`
 
 	// The IDs of the AWS accounts that can create volumes from the snapshot.
@@ -67778,9 +67791,34 @@ type DescribeVolumesModificationsInput struct {
 	// it is UnauthorizedOperation.
 	DryRun *bool `type:"boolean"`
 
-	// The filters. Supported filters: volume-id | modification-state | target-size
-	// | target-iops | target-volume-type | original-size | original-iops | original-volume-type
-	// | start-time | originalMultiAttachEnabled | targetMultiAttachEnabled.
+	// The filters.
+	//
+	//    * modification-state - The current modification state (modifying | optimizing
+	//    | completed | failed).
+	//
+	//    * original-iops - The original IOPS rate of the volume.
+	//
+	//    * original-size - The original size of the volume, in GiB.
+	//
+	//    * original-volume-type - The original volume type of the volume (standard
+	//    | io1 | gp2 | sc1 | st1).
+	//
+	//    * originalMultiAttachEnabled - Indicates whether Multi-Attach support
+	//    was enabled (true | false).
+	//
+	//    * start-time - The modification start time.
+	//
+	//    * target-iops - The target IOPS rate of the volume.
+	//
+	//    * target-size - The target size of the volume, in GiB.
+	//
+	//    * target-volume-type - The target volume type of the volume (standard
+	//    | io1 | gp2 | sc1 | st1).
+	//
+	//    * targetMultiAttachEnabled - Indicates whether Multi-Attach support is
+	//    to be enabled (true | false).
+	//
+	//    * volume-id - The ID of the volume.
 	Filters []*Filter `locationName:"Filter" locationNameList:"Filter" type:"list"`
 
 	// The maximum number of results (up to a limit of 500) to be returned in a
@@ -67790,7 +67828,7 @@ type DescribeVolumesModificationsInput struct {
 	// The nextToken value returned by a previous paginated request.
 	NextToken *string `type:"string"`
 
-	// The IDs of the volumes for which in-progress modifications will be described.
+	// The IDs of the volumes.
 	VolumeIds []*string `locationName:"VolumeId" locationNameList:"VolumeId" type:"list"`
 }
 
@@ -70101,10 +70139,11 @@ type DisableFastSnapshotRestoreSuccessItem struct {
 	// The time at which fast snapshot restores entered the optimizing state.
 	OptimizingTime *time.Time `locationName:"optimizingTime" type:"timestamp"`
 
-	// The alias of the snapshot owner.
+	// The AWS owner alias that enabled fast snapshot restores on the snapshot.
+	// This is intended for future use.
 	OwnerAlias *string `locationName:"ownerAlias" type:"string"`
 
-	// The ID of the AWS account that owns the snapshot.
+	// The ID of the AWS account that enabled fast snapshot restores on the snapshot.
 	OwnerId *string `locationName:"ownerId" type:"string"`
 
 	// The ID of the snapshot.
@@ -71653,6 +71692,9 @@ type EbsInfo struct {
 
 	// Indicates whether Amazon EBS encryption is supported.
 	EncryptionSupport *string `locationName:"encryptionSupport" type:"string" enum:"EbsEncryptionSupport"`
+
+	// Indicates whether non-volatile memory express (NVMe) is supported.
+	NvmeSupport *string `locationName:"nvmeSupport" type:"string" enum:"EbsNvmeSupport"`
 }
 
 // String returns the string representation
@@ -71680,6 +71722,12 @@ func (s *EbsInfo) SetEbsOptimizedSupport(v string) *EbsInfo {
 // SetEncryptionSupport sets the EncryptionSupport field's value.
 func (s *EbsInfo) SetEncryptionSupport(v string) *EbsInfo {
 	s.EncryptionSupport = &v
+	return s
+}
+
+// SetNvmeSupport sets the NvmeSupport field's value.
+func (s *EbsInfo) SetNvmeSupport(v string) *EbsInfo {
+	s.NvmeSupport = &v
 	return s
 }
 
@@ -72115,7 +72163,7 @@ type ElasticInferenceAccelerator struct {
 	Count *int64 `min:"1" type:"integer"`
 
 	// The type of elastic inference accelerator. The possible values are eia1.medium,
-	// eia1.large, and eia1.xlarge.
+	// eia1.large, eia1.xlarge, eia2.medium, eia2.large, and eia2.xlarge.
 	//
 	// Type is a required field
 	Type *string `type:"string" required:"true"`
@@ -72383,10 +72431,11 @@ type EnableFastSnapshotRestoreSuccessItem struct {
 	// The time at which fast snapshot restores entered the optimizing state.
 	OptimizingTime *time.Time `locationName:"optimizingTime" type:"timestamp"`
 
-	// The alias of the snapshot owner.
+	// The AWS owner alias that enabled fast snapshot restores on the snapshot.
+	// This is intended for future use.
 	OwnerAlias *string `locationName:"ownerAlias" type:"string"`
 
-	// The ID of the AWS account that owns the snapshot.
+	// The ID of the AWS account that enabled fast snapshot restores on the snapshot.
 	OwnerId *string `locationName:"ownerId" type:"string"`
 
 	// The ID of the snapshot.
@@ -73198,7 +73247,7 @@ type ExportImageInput struct {
 	// Token to enable idempotency for export image requests.
 	ClientToken *string `type:"string" idempotencyToken:"true"`
 
-	// A description of the image being exported. The maximum length is 255 bytes.
+	// A description of the image being exported. The maximum length is 255 characters.
 	Description *string `type:"string"`
 
 	// The disk image format.
@@ -73218,15 +73267,18 @@ type ExportImageInput struct {
 	ImageId *string `type:"string" required:"true"`
 
 	// The name of the role that grants VM Import/Export permission to export images
-	// to your S3 bucket. If this parameter is not specified, the default role is
-	// named 'vmimport'.
+	// to your Amazon S3 bucket. If this parameter is not specified, the default
+	// role is named 'vmimport'.
 	RoleName *string `type:"string"`
 
-	// Information about the destination S3 bucket. The bucket must exist and grant
-	// WRITE and READ_ACP permissions to the AWS account vm-import-export@amazon.com.
+	// Information about the destination Amazon S3 bucket. The bucket must exist
+	// and grant WRITE and READ_ACP permissions to the AWS account vm-import-export@amazon.com.
 	//
 	// S3ExportLocation is a required field
 	S3ExportLocation *ExportTaskS3LocationRequest `type:"structure" required:"true"`
+
+	// The tags to apply to the image being exported.
+	TagSpecifications []*TagSpecification `locationName:"TagSpecification" locationNameList:"item" type:"list"`
 }
 
 // String returns the string representation
@@ -73305,6 +73357,12 @@ func (s *ExportImageInput) SetS3ExportLocation(v *ExportTaskS3LocationRequest) *
 	return s
 }
 
+// SetTagSpecifications sets the TagSpecifications field's value.
+func (s *ExportImageInput) SetTagSpecifications(v []*TagSpecification) *ExportImageInput {
+	s.TagSpecifications = v
+	return s
+}
+
 type ExportImageOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -73324,10 +73382,10 @@ type ExportImageOutput struct {
 	Progress *string `locationName:"progress" type:"string"`
 
 	// The name of the role that grants VM Import/Export permission to export images
-	// to your S3 bucket.
+	// to your Amazon S3 bucket.
 	RoleName *string `locationName:"roleName" type:"string"`
 
-	// Information about the destination S3 bucket.
+	// Information about the destination Amazon S3 bucket.
 	S3ExportLocation *ExportTaskS3Location `locationName:"s3ExportLocation" type:"structure"`
 
 	// The status of the export image task. The possible values are active, completed,
@@ -73336,6 +73394,9 @@ type ExportImageOutput struct {
 
 	// The status message for the export image task.
 	StatusMessage *string `locationName:"statusMessage" type:"string"`
+
+	// Any tags assigned to the image being exported.
+	Tags []*Tag `locationName:"tagSet" locationNameList:"item" type:"list"`
 }
 
 // String returns the string representation
@@ -73402,6 +73463,12 @@ func (s *ExportImageOutput) SetStatusMessage(v string) *ExportImageOutput {
 	return s
 }
 
+// SetTags sets the Tags field's value.
+func (s *ExportImageOutput) SetTags(v []*Tag) *ExportImageOutput {
+	s.Tags = v
+	return s
+}
+
 // Describes an export image task.
 type ExportImageTask struct {
 	_ struct{} `type:"structure"`
@@ -73418,7 +73485,7 @@ type ExportImageTask struct {
 	// The percent complete of the export image task.
 	Progress *string `locationName:"progress" type:"string"`
 
-	// Information about the destination S3 bucket.
+	// Information about the destination Amazon S3 bucket.
 	S3ExportLocation *ExportTaskS3Location `locationName:"s3ExportLocation" type:"structure"`
 
 	// The status of the export image task. The possible values are active, completed,
@@ -73427,6 +73494,9 @@ type ExportImageTask struct {
 
 	// The status message for the export image task.
 	StatusMessage *string `locationName:"statusMessage" type:"string"`
+
+	// Any tags assigned to the image being exported.
+	Tags []*Tag `locationName:"tagSet" locationNameList:"item" type:"list"`
 }
 
 // String returns the string representation
@@ -73478,6 +73548,12 @@ func (s *ExportImageTask) SetStatus(v string) *ExportImageTask {
 // SetStatusMessage sets the StatusMessage field's value.
 func (s *ExportImageTask) SetStatusMessage(v string) *ExportImageTask {
 	s.StatusMessage = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *ExportImageTask) SetTags(v []*Tag) *ExportImageTask {
+	s.Tags = v
 	return s
 }
 
@@ -73563,7 +73639,7 @@ func (s *ExportTask) SetTags(v []*Tag) *ExportTask {
 type ExportTaskS3Location struct {
 	_ struct{} `type:"structure"`
 
-	// The destination S3 bucket.
+	// The destination Amazon S3 bucket.
 	S3Bucket *string `locationName:"s3Bucket" type:"string"`
 
 	// The prefix (logical hierarchy) in the bucket.
@@ -73596,7 +73672,7 @@ func (s *ExportTaskS3Location) SetS3Prefix(v string) *ExportTaskS3Location {
 type ExportTaskS3LocationRequest struct {
 	_ struct{} `type:"structure"`
 
-	// The destination S3 bucket.
+	// The destination Amazon S3 bucket.
 	//
 	// S3Bucket is a required field
 	S3Bucket *string `type:"string" required:"true"`
@@ -73651,8 +73727,8 @@ type ExportToS3Task struct {
 	// The format for the exported image.
 	DiskImageFormat *string `locationName:"diskImageFormat" type:"string" enum:"DiskImageFormat"`
 
-	// The S3 bucket for the destination image. The destination bucket must exist
-	// and grant WRITE and READ_ACP permissions to the AWS account vm-import-export@amazon.com.
+	// The Amazon S3 bucket for the destination image. The destination bucket must
+	// exist and grant WRITE and READ_ACP permissions to the AWS account vm-import-export@amazon.com.
 	S3Bucket *string `locationName:"s3Bucket" type:"string"`
 
 	// The encryption key for your S3 bucket.
@@ -73704,12 +73780,12 @@ type ExportToS3TaskSpecification struct {
 	// The format for the exported image.
 	DiskImageFormat *string `locationName:"diskImageFormat" type:"string" enum:"DiskImageFormat"`
 
-	// The S3 bucket for the destination image. The destination bucket must exist
-	// and grant WRITE and READ_ACP permissions to the AWS account vm-import-export@amazon.com.
+	// The Amazon S3 bucket for the destination image. The destination bucket must
+	// exist and grant WRITE and READ_ACP permissions to the AWS account vm-import-export@amazon.com.
 	S3Bucket *string `locationName:"s3Bucket" type:"string"`
 
-	// The image is written to a single object in the S3 bucket at the S3 key s3prefix
-	// + exportTaskId + '.' + diskImageFormat.
+	// The image is written to a single object in the Amazon S3 bucket at the S3
+	// key s3prefix + exportTaskId + '.' + diskImageFormat.
 	S3Prefix *string `locationName:"s3Prefix" type:"string"`
 }
 
@@ -78143,7 +78219,7 @@ type ImageDiskContainer struct {
 
 	// The format of the disk image being imported.
 	//
-	// Valid values: VHD | VMDK | OVA
+	// Valid values: OVA | VHD | VHDX |VMDK
 	Format *string `type:"string"`
 
 	// The ID of the EBS snapshot to be used for importing the snapshot.
@@ -78385,6 +78461,9 @@ type ImportImageInput struct {
 
 	// The name of the role to use when not using the default role, 'vmimport'.
 	RoleName *string `type:"string"`
+
+	// The tags to apply to the image being imported.
+	TagSpecifications []*TagSpecification `locationName:"TagSpecification" locationNameList:"item" type:"list"`
 }
 
 // String returns the string representation
@@ -78475,6 +78554,12 @@ func (s *ImportImageInput) SetRoleName(v string) *ImportImageInput {
 	return s
 }
 
+// SetTagSpecifications sets the TagSpecifications field's value.
+func (s *ImportImageInput) SetTagSpecifications(v []*TagSpecification) *ImportImageInput {
+	s.TagSpecifications = v
+	return s
+}
+
 // The request information of license configurations.
 type ImportImageLicenseConfigurationRequest struct {
 	_ struct{} `type:"structure"`
@@ -78532,7 +78617,7 @@ type ImportImageOutput struct {
 	// A description of the import task.
 	Description *string `locationName:"description" type:"string"`
 
-	// Indicates whether the AMI is encypted.
+	// Indicates whether the AMI is encrypted.
 	Encrypted *bool `locationName:"encrypted" type:"boolean"`
 
 	// The target hypervisor of the import task.
@@ -78568,6 +78653,9 @@ type ImportImageOutput struct {
 
 	// A detailed status message of the import task.
 	StatusMessage *string `locationName:"statusMessage" type:"string"`
+
+	// Any tags assigned to the image being imported.
+	Tags []*Tag `locationName:"tagSet" locationNameList:"item" type:"list"`
 }
 
 // String returns the string representation
@@ -78661,6 +78749,12 @@ func (s *ImportImageOutput) SetStatus(v string) *ImportImageOutput {
 // SetStatusMessage sets the StatusMessage field's value.
 func (s *ImportImageOutput) SetStatusMessage(v string) *ImportImageOutput {
 	s.StatusMessage = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *ImportImageOutput) SetTags(v []*Tag) *ImportImageOutput {
+	s.Tags = v
 	return s
 }
 
@@ -79364,6 +79458,9 @@ type ImportSnapshotInput struct {
 
 	// The name of the role to use when not using the default role, 'vmimport'.
 	RoleName *string `type:"string"`
+
+	// The tags to apply to the snapshot being imported.
+	TagSpecifications []*TagSpecification `locationName:"TagSpecification" locationNameList:"item" type:"list"`
 }
 
 // String returns the string representation
@@ -79424,6 +79521,12 @@ func (s *ImportSnapshotInput) SetRoleName(v string) *ImportSnapshotInput {
 	return s
 }
 
+// SetTagSpecifications sets the TagSpecifications field's value.
+func (s *ImportSnapshotInput) SetTagSpecifications(v []*TagSpecification) *ImportSnapshotInput {
+	s.TagSpecifications = v
+	return s
+}
+
 type ImportSnapshotOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -79435,6 +79538,9 @@ type ImportSnapshotOutput struct {
 
 	// Information about the import snapshot task.
 	SnapshotTaskDetail *SnapshotTaskDetail `locationName:"snapshotTaskDetail" type:"structure"`
+
+	// Any tags assigned to the snapshot being imported.
+	Tags []*Tag `locationName:"tagSet" locationNameList:"item" type:"list"`
 }
 
 // String returns the string representation
@@ -79462,6 +79568,12 @@ func (s *ImportSnapshotOutput) SetImportTaskId(v string) *ImportSnapshotOutput {
 // SetSnapshotTaskDetail sets the SnapshotTaskDetail field's value.
 func (s *ImportSnapshotOutput) SetSnapshotTaskDetail(v *SnapshotTaskDetail) *ImportSnapshotOutput {
 	s.SnapshotTaskDetail = v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *ImportSnapshotOutput) SetTags(v []*Tag) *ImportSnapshotOutput {
+	s.Tags = v
 	return s
 }
 
@@ -101192,9 +101304,10 @@ type Snapshot struct {
 	// key for the parent volume.
 	KmsKeyId *string `locationName:"kmsKeyId" type:"string"`
 
-	// Value from an Amazon-maintained list (amazon | self | all | aws-marketplace
-	// | microsoft) of snapshot owners. Not to be confused with the user-configured
-	// AWS account alias, which is set from the IAM console.
+	// The AWS owner alias, as maintained by Amazon. The possible values are: amazon
+	// | self | all | aws-marketplace | microsoft. This AWS owner alias is not to
+	// be confused with the user-configured AWS account alias, which is set from
+	// the IAM console.
 	OwnerAlias *string `locationName:"ownerAlias" type:"string"`
 
 	// The AWS account ID of the EBS snapshot owner.
@@ -101357,7 +101470,7 @@ type SnapshotDetail struct {
 	// The URL used to access the disk image.
 	Url *string `locationName:"url" type:"string"`
 
-	// The S3 bucket for the disk image.
+	// The Amazon S3 bucket for the disk image.
 	UserBucket *UserBucketDetails `locationName:"userBucket" type:"structure"`
 }
 
@@ -101447,7 +101560,7 @@ type SnapshotDiskContainer struct {
 	// a https URL (https://..) or an Amazon S3 URL (s3://..).
 	Url *string `type:"string"`
 
-	// The S3 bucket for the disk image.
+	// The Amazon S3 bucket for the disk image.
 	UserBucket *UserBucket `type:"structure"`
 }
 
@@ -101627,7 +101740,7 @@ type SnapshotTaskDetail struct {
 	// The URL of the disk image from which the snapshot is created.
 	Url *string `locationName:"url" type:"string"`
 
-	// The S3 bucket for the disk image.
+	// The Amazon S3 bucket for the disk image.
 	UserBucket *UserBucketDetails `locationName:"userBucket" type:"structure"`
 }
 
@@ -107357,11 +107470,11 @@ func (s *UpdateSecurityGroupRuleDescriptionsIngressOutput) SetReturn(v bool) *Up
 	return s
 }
 
-// Describes the S3 bucket for the disk image.
+// Describes the Amazon S3 bucket for the disk image.
 type UserBucket struct {
 	_ struct{} `type:"structure"`
 
-	// The name of the S3 bucket where the disk image is located.
+	// The name of the Amazon S3 bucket where the disk image is located.
 	S3Bucket *string `type:"string"`
 
 	// The file name of the disk image.
@@ -107390,11 +107503,11 @@ func (s *UserBucket) SetS3Key(v string) *UserBucket {
 	return s
 }
 
-// Describes the S3 bucket for the disk image.
+// Describes the Amazon S3 bucket for the disk image.
 type UserBucketDetails struct {
 	_ struct{} `type:"structure"`
 
-	// The S3 bucket from which the disk image was created.
+	// The Amazon S3 bucket from which the disk image was created.
 	S3Bucket *string `locationName:"s3Bucket" type:"string"`
 
 	// The file name of the disk image.
@@ -108031,7 +108144,7 @@ type VolumeModification struct {
 	// The original IOPS rate of the volume.
 	OriginalIops *int64 `locationName:"originalIops" type:"integer"`
 
-	// The original size of the volume.
+	// The original size of the volume, in GiB.
 	OriginalSize *int64 `locationName:"originalSize" type:"integer"`
 
 	// The original EBS volume type of the volume.
@@ -110440,6 +110553,17 @@ const (
 )
 
 const (
+	// EbsNvmeSupportUnsupported is a EbsNvmeSupport enum value
+	EbsNvmeSupportUnsupported = "unsupported"
+
+	// EbsNvmeSupportSupported is a EbsNvmeSupport enum value
+	EbsNvmeSupportSupported = "supported"
+
+	// EbsNvmeSupportRequired is a EbsNvmeSupport enum value
+	EbsNvmeSupportRequired = "required"
+)
+
+const (
 	// EbsOptimizedSupportUnsupported is a EbsOptimizedSupport enum value
 	EbsOptimizedSupportUnsupported = "unsupported"
 
@@ -112350,6 +112474,15 @@ const (
 	// ResourceTypeElasticIp is a ResourceType enum value
 	ResourceTypeElasticIp = "elastic-ip"
 
+	// ResourceTypeElasticGpu is a ResourceType enum value
+	ResourceTypeElasticGpu = "elastic-gpu"
+
+	// ResourceTypeExportImageTask is a ResourceType enum value
+	ResourceTypeExportImageTask = "export-image-task"
+
+	// ResourceTypeExportInstanceTask is a ResourceType enum value
+	ResourceTypeExportInstanceTask = "export-instance-task"
+
 	// ResourceTypeFleet is a ResourceType enum value
 	ResourceTypeFleet = "fleet"
 
@@ -112362,6 +112495,12 @@ const (
 	// ResourceTypeImage is a ResourceType enum value
 	ResourceTypeImage = "image"
 
+	// ResourceTypeImportImageTask is a ResourceType enum value
+	ResourceTypeImportImageTask = "import-image-task"
+
+	// ResourceTypeImportSnapshotTask is a ResourceType enum value
+	ResourceTypeImportSnapshotTask = "import-snapshot-task"
+
 	// ResourceTypeInstance is a ResourceType enum value
 	ResourceTypeInstance = "instance"
 
@@ -112373,6 +112512,9 @@ const (
 
 	// ResourceTypeLaunchTemplate is a ResourceType enum value
 	ResourceTypeLaunchTemplate = "launch-template"
+
+	// ResourceTypeLocalGatewayRouteTableVpcAssociation is a ResourceType enum value
+	ResourceTypeLocalGatewayRouteTableVpcAssociation = "local-gateway-route-table-vpc-association"
 
 	// ResourceTypeNatgateway is a ResourceType enum value
 	ResourceTypeNatgateway = "natgateway"
