@@ -17,3 +17,4 @@ jobs:
         team_slug: aws-provider
         slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
         slack_channel: ${{ secrets.SLACK_CHANNEL }}
+        
